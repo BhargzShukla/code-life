@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import openSocket from "socket.io-client";
+import "./App.css";
 
+const socket = openSocket("http://localhost:8000");
 function App() {
+  const [clientCode, setClientCode] = useState("");
+
+  useEffect(() => {
+    socket.emit("clientSend", clientCode);
+    socket.on("serverSend", (arg) => setClientCode(arg));
+    console.log("Code received from server = ", clientCode);
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="App">
+      <h1>Live Coding Session</h1>
+      <textarea
+        name="live-editor"
+        id="live-editor"
+        cols="100"
+        rows="50"
+        onChange={(e) => setClientCode(e.target.value)}
+        value={clientCode}
+      ></textarea>
+    </main>
   );
 }
 
