@@ -8,25 +8,51 @@ const serverUrl =
     : "https://warm-brushlands-48090.herokuapp.com";
 const socket = openSocket(serverUrl);
 function App() {
-  const [clientCode, setClientCode] = useState("");
+  const [clientCode, setClientCode] = useState(
+    window.localStorage.getItem("clientCode") || ""
+  );
+
+  const handleKeyDown = (evt) => {
+    let value = clientCode,
+      selStartPos = evt.currentTarget.selectionStart;
+
+    if (evt.key === "Tab") {
+      value =
+        value.substring(0, selStartPos) +
+        "   " +
+        value.substring(selStartPos, value.length);
+      evt.currentTarget.selectionStart = selStartPos + 3;
+      evt.currentTarget.selectionEnd = selStartPos + 4;
+      evt.preventDefault();
+
+      setClientCode(value);
+    }
+  };
 
   useEffect(() => {
-    socket.emit("clientSend", clientCode);
-    socket.on("serverSend", (arg) => setClientCode(arg));
-    console.log("Code received from server = ", clientCode);
+    (async () => {
+      await socket.emit("clientSend", clientCode);
+      await socket.on("serverSend", (arg) => setClientCode(arg));
+    })();
+    window.localStorage.setItem("clientCode", clientCode);
   });
 
   return (
-    <main className="App">
+    <main className="content">
       <h1>Live Coding Session</h1>
-      <textarea
-        name="live-editor"
-        id="live-editor"
-        cols="100"
-        rows="50"
-        onChange={(e) => setClientCode(e.target.value)}
-        value={clientCode}
-      ></textarea>
+      <fieldset>
+        <legend>Input code here</legend>
+        <textarea
+          name="code-input"
+          id="code-input"
+          value={clientCode}
+          rows="40"
+          onChange={(evt) => setClientCode(evt.target.value)}
+          onKeyDown={handleKeyDown}
+        ></textarea>
+      </fieldset>
+
+      <button onClick={() => setClientCode("")}>Clear</button>
     </main>
   );
 }
