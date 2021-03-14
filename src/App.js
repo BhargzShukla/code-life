@@ -3,10 +3,12 @@ import openSocket from "socket.io-client";
 import "./App.css";
 
 const serverUrl =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:8000"
-    : "https://warm-brushlands-48090.herokuapp.com";
+  process.env.NODE_ENV === "production"
+    ? "https://warm-brushlands-48090.herokuapp.com"
+    : "http://localhost:8000";
 const socket = openSocket(serverUrl);
+
+console.log(serverUrl);
 function App() {
   const [clientCode, setClientCode] = useState(
     window.localStorage.getItem("clientCode") || ""
@@ -31,7 +33,7 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      await socket.emit("clientSend", clientCode);
+      socket.emit("clientSend", clientCode);
       await socket.on("serverSend", (arg) => setClientCode(arg));
     })();
     window.localStorage.setItem("clientCode", clientCode);
