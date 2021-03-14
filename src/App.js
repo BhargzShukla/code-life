@@ -3,7 +3,7 @@ import openSocket from "socket.io-client";
 import "./App.css";
 
 const serverUrl =
-  process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === "development"
     ? "https://warm-brushlands-48090.herokuapp.com"
     : `http://localhost:${process.env.PORT || 8000}`;
 const socket = openSocket(serverUrl);
