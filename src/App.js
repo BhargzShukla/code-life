@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 
@@ -8,9 +8,7 @@ const herokuUrl = "https://warm-brushlands-48090.herokuapp.com";
 const localUrl = `http://localhost:${process.env.PORT || 8000}`;
 
 function App() {
-  const [clientCode, setClientCode] = useState(
-    window.localStorage.getItem("clientCode") || ""
-  );
+  const [clientCode, setClientCode] = useState("");
 
   const handleKeyDown = (evt) => {
     let value = clientCode,
@@ -31,16 +29,20 @@ function App() {
 
   const clearCode = () => {
     setClientCode("");
-    window.localStorage.removeItem("clientCode");
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const socket = io(herokuUrl);
-    window.localStorage.setItem("clientCode", clientCode);
+    setImmediate(async () => {
+      await socket.on("serverSend", (arg) => setClientCode(arg));
+    }, 100);
     socket.emit("clientSend", clientCode);
-    socket.on("serverSend", (arg) => setClientCode(arg));
 
-    return () => socket.disconnect();
+    console.log("Server code ", clientCode);
+
+    return () => {
+      socket.disconnect();
+    };
   });
 
   return (
