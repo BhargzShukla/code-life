@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import openSocket from "socket.io-client";
+import { io } from "socket.io-client";
 import "./App.css";
 
-const serverUrl =
-  process.env.NODE_ENV === "development"
-    ? "https://warm-brushlands-48090.herokuapp.com"
-    : `http://localhost:${process.env.PORT || 8000}`;
-const socket = openSocket(serverUrl);
+// eslint-disable-next-line no-unused-vars
+const herokuUrl = "https://warm-brushlands-48090.herokuapp.com";
+// eslint-disable-next-line no-unused-vars
+const localUrl = `http://localhost:${process.env.PORT || 8000}`;
 
 function App() {
   const [clientCode, setClientCode] = useState(
@@ -30,12 +29,18 @@ function App() {
     }
   };
 
+  const clearCode = () => {
+    setClientCode("");
+    window.localStorage.removeItem("clientCode");
+  };
+
   useEffect(() => {
-    (async () => {
-      socket.emit("clientSend", clientCode);
-      await socket.on("serverSend", (arg) => setClientCode(arg));
-    })();
+    const socket = io(herokuUrl);
     window.localStorage.setItem("clientCode", clientCode);
+    socket.emit("clientSend", clientCode);
+    socket.on("serverSend", (arg) => setClientCode(arg));
+
+    return () => socket.disconnect();
   });
 
   return (
@@ -53,7 +58,7 @@ function App() {
         ></textarea>
       </fieldset>
 
-      <button onClick={() => setClientCode("")}>Clear</button>
+      <button onClick={clearCode}>Clear</button>
     </main>
   );
 }

@@ -11,8 +11,8 @@ let currentCode = "";
 io.on("connection", (socket) => {
   socket.on("clientSend", (arg) => {
     currentCode = arg;
-    socket.broadcast.emit("serverSend", currentCode);
   });
+  socket.broadcast.emit("serverSend", currentCode);
 });
 
 let port = process.env.PORT || 8000;
