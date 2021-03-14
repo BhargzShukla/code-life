@@ -5,10 +5,9 @@ import "./App.css";
 const serverUrl =
   process.env.NODE_ENV === "production"
     ? "https://warm-brushlands-48090.herokuapp.com"
-    : "http://localhost:8000";
+    : `http://localhost:${process.env.PORT || 8000}`;
 const socket = openSocket(serverUrl);
 
-console.log(serverUrl);
 function App() {
   const [clientCode, setClientCode] = useState(
     window.localStorage.getItem("clientCode") || ""
