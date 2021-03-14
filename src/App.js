@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import openSocket from "socket.io-client";
 import "./App.css";
 
-const socket = openSocket(
-  `https://warm-brushlands-48090.herokuapp.com:${process.env.PORT ?? 8000}`
-);
+const serverUrl =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:8000"
+    : "https://warm-brushlands-48090.herokuapp.com";
+const socket = openSocket(serverUrl);
 function App() {
   const [clientCode, setClientCode] = useState("");
 
