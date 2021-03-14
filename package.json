@@ -15,7 +15,7 @@
     "web-vitals": "^1.1.0"
   },
   "scripts": {
-    "prestart": "node server &",
+    "prestart": "node server",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
